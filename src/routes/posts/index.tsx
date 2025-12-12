@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { z } from "zod";
+
+const searchSchema = z.object({
+	q: z.string().catch(""),
+});
 
 export const Route = createFileRoute("/posts/")({
 	component: RouteComponent,
-	validateSearch: (search) => {
-		return {
-			q: (search.q as string) || "",
-		};
-	},
+	validateSearch: searchSchema,
 	loaderDeps: ({ search: { q } }) => ({
 		q,
 	}),
