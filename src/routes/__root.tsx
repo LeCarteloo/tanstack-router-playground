@@ -12,14 +12,7 @@ export const Route = createRootRoute({
 				<div>
 					<Link to="/">Home</Link>
 					<Link to="/about">About</Link>
-					<Link
-						to="/posts"
-						search={{
-							q: "post1",
-						}}
-					>
-						Posts
-					</Link>
+					<Link to="/posts">Posts</Link>
 					<hr />
 				</div>
 				<Outlet />
