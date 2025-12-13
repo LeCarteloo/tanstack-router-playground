@@ -1,10 +1,10 @@
-import { queryOptions } from "@tanstack/react-query";
-import { getPost, getPosts } from ".";
+import { queryOptions } from '@tanstack/react-query';
+import { getPost, getPosts } from '.';
 
 export const queryKeys = {
-	all: () => ["post"],
+	all: () => ['post'],
 	getPost: (postId: string) => [...queryKeys.all(), postId],
-	getPosts: () => [...queryKeys.all(), "list"],
+	getPosts: () => [...queryKeys.all(), 'list'],
 };
 
 export const getPostQueryOptions = (postId: string) =>
@@ -13,8 +13,8 @@ export const getPostQueryOptions = (postId: string) =>
 		queryFn: () => getPost(postId),
 	});
 
-export const getPostsQueryOptions = () =>
+export const getPostsQueryOptions = (search?: string) =>
 	queryOptions({
 		queryKey: queryKeys.getPosts(),
-		queryFn: getPosts,
+		queryFn: () => getPosts(search ?? ''),
 	});

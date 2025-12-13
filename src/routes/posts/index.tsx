@@ -1,35 +1,31 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { z } from "zod";
-import { getPosts } from "./-api";
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { z } from 'zod';
+import { useDeletePost } from './-api/mutation';
+import { getPostsQueryOptions } from './-api/query';
 
 const searchSchema = z.object({
-	q: z.string().catch("").optional(),
+	q: z.string().optional().catch(''),
 });
 
-export const Route = createFileRoute("/posts/")({
+export const Route = createFileRoute('/posts/')({
 	component: RouteComponent,
 	validateSearch: searchSchema,
-	loaderDeps: ({ search: { q } }) => ({
-		q,
-	}),
-	loader: async ({ deps }) => {
-		const posts = await getPosts();
-
-		if (!deps.q) {
-			return {
-				posts,
-			};
-		}
-
+	loaderDeps: ({ search }) => {
 		return {
-			posts: posts.filter((post) => post.id === deps.q),
+			q: search.q,
 		};
 	},
+	loader: async ({ deps, context }) => {
+		context.queryClient.ensureQueryData(getPostsQueryOptions(deps.q));
+	},
+	pendingComponent: () => <div>Loading list of posts...</div>,
 });
 
 function RouteComponent() {
-	const { posts } = Route.useLoaderData();
 	const { q } = Route.useSearch();
+	const { data: posts } = useSuspenseQuery(getPostsQueryOptions(q));
+	const { mutate } = useDeletePost();
 
 	return (
 		<div>
@@ -38,13 +34,17 @@ function RouteComponent() {
 			{posts.map(({ id, title }) => (
 				<div key={id}>
 					<Link
-						to={"/posts/$postId"}
+						to={'/posts/$postId'}
 						params={{
 							postId: id,
 						}}
+						preload="intent"
 					>
 						{title}
 					</Link>
+					<button type="button" onClick={() => mutate(id)}>
+						Delete
+					</button>
 				</div>
 			))}
 		</div>

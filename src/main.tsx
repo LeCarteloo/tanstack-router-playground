@@ -1,14 +1,38 @@
-import { createRouter, RouterProvider } from "@tanstack/react-router";
-import { StrictMode } from "react";
-import ReactDOM from "react-dom/client";
-import { routeTree } from "./routeTree.gen.ts";
+import { createRouter, RouterProvider } from '@tanstack/react-router';
+import { StrictMode } from 'react';
+import ReactDOM from 'react-dom/client';
+import { routeTree } from './routeTree.gen.ts';
 
-// Import the generated route tree
+import './styles.css';
 
-import "./styles.css";
-import reportWebVitals from "./reportWebVitals.ts";
+import {
+	MutationCache,
+	QueryClient,
+	QueryClientProvider,
+	type QueryKey,
+} from '@tanstack/react-query';
+import reportWebVitals from './reportWebVitals.ts';
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+declare module '@tanstack/react-router' {
+	interface Register {
+		router: typeof router;
+		mutationMeta: {
+			invalidQuery?: QueryKey;
+			successMessage?: string;
+			errorMessage?: string;
+		};
+	}
+}
+
+// declare module '@tanstack/react-query' {
+// 	interface Register {
+// 		mutationMeta: {
+// 			invalidQuery?: QueryKey;
+// 			successMessage?: string;
+// 			errorMessage?: string;
+// 		};
+// 	}
+// }
 
 const queryClient = new QueryClient();
 
@@ -19,14 +43,8 @@ const router = createRouter({
 	},
 });
 
-declare module "@tanstack/react-router" {
-	interface Register {
-		router: typeof router;
-	}
-}
-
 // Render the app
-const rootElement = document.getElementById("app");
+const rootElement = document.getElementById('app');
 if (rootElement && !rootElement.innerHTML) {
 	const root = ReactDOM.createRoot(rootElement);
 	root.render(
